@@ -33,7 +33,9 @@ RUN case "${TARGETARCH}" in \
 
 RUN npm install -g typescript typescript-language-server
 
-COPY --chown=agent:agent opencode.json tui.json /home/agent/workspace/
+RUN install -d -o agent -g agent /home/agent/.config/opencode
+COPY --chown=agent:agent opencode.json /home/agent/.config/opencode/opencode.json
+COPY --chown=agent:agent tui.json /home/agent/.config/opencode/tui.json
 
 USER agent
 

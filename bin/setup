@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+IMAGE_NAME="opencode-dev"
+TAR_FILE="/tmp/${IMAGE_NAME}.tar"
+
+echo "=== Setting up opencode sandbox (one-time global setup) ==="
+
+# Detect platform
+ARCH="$(uname -m)"
+case "$ARCH" in
+  arm64) PLATFORM="linux/arm64" ;;
+  x86_64) PLATFORM="linux/amd64" ;;
+  *) echo "Unsupported architecture: $ARCH" >&2; exit 1 ;;
+esac
+
+# Build the Docker image locally (no registry needed)
+echo "[..] Building sandbox image for $PLATFORM..."
+docker buildx build \
+  --platform "$PLATFORM" \
+  -t "$IMAGE_NAME" \
+  --load \
+  "$REPO_ROOT"
+
+# Export to tar and load into sbx's local image store
+echo "[..] Loading image into sbx..."
+docker save "$IMAGE_NAME" -o "$TAR_FILE"
+sbx template load "$TAR_FILE"
+rm -f "$TAR_FILE"
+
+# Clean up the local Docker image (sbx has its own copy now)
+docker rmi "$IMAGE_NAME" 2>/dev/null || true
+
+echo ""
+echo "=== Setup complete ==="
+echo "You can now run: sbx-opencode"

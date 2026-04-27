@@ -1,30 +1,18 @@
-## Installation
+# Usage
+Perform this one-time setup once:
 ```bash
-# install docker sandbox (MacOS)
-brew install docker/tap/sbx
-sbx login
+# Setup the Docker sandbox template.
+./bin/setup
+
+# Link `sbx-opencode` to a directory added to PATH (optional) 
+ln -s /Users/kargo/git/personal/docker-sandbox/bin/sbx-opencode /Users/kargo/.local/bin/sbx-opencode
+```
+Then use it:
+```bash
+cd ~/git/my-project/
+sbx-opencode
 ```
 
-## Quick Start
-```bash
-# Start a docker container and detach from it after the command finishes.
-# Named 'registry', and using the "registry:2" image from docker hub.
-docker run -d --restart=always -p 5000:5000 --name registry registry:2
-
-# Use `buildx` for extended build capabilities with Buildkit (allowing us to
-# run for platform `linux/arm64`)
-# `localhost:5000/opencode-sandbox:dev` means:
-# registry:   localhost:5000
-# repository: opencode-sandbox
-# tag:        dev
-# `--push` to immediately push to registry (in this case `localhost:5000`) after building.
-docker buildx build \
-  --platform linux/arm64 \
-  -t localhost:5000/opencode-sandbox:dev \
-  --push \
-  .
-
-#
-sbx run --template localhost:5000/opencode-sandbox:dev opencode .
-```
-
+You will have to manually allow network permissions as needed. Run `sbx` to
+open the Docker sandbox dashboard, where you will be able to interactively
+allow and disallow networks.
