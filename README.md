@@ -4,8 +4,10 @@ Perform this one-time setup once:
 # Setup the Docker sandbox template.
 ./bin/setup
 
-# Link `sbx-opencode` to a directory added to PATH (optional) 
+# Link helper scripts to a directory added to PATH (optional) 
 ln -s /Users/kargo/git/personal/docker-sandbox/bin/sbx-opencode /Users/kargo/.local/bin/sbx-opencode
+ln -s /Users/kargo/git/personal/docker-sandbox/bin/sbx-claude /Users/kargo/.local/bin/sbx-claude
+ln -s /Users/kargo/git/personal/docker-sandbox/bin/sbx-shell /Users/kargo/.local/bin/sbx-shell
 ```
 Then use it:
 ```bash
