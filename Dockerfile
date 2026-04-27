@@ -33,7 +33,7 @@ RUN case "${TARGETARCH}" in \
 
 RUN npm install -g typescript typescript-language-server
 
-RUN curl -fsSL https://claude.ai/install.sh | bash
+RUN npm install -g @anthropic-ai/claude-code
 
 RUN install -d -o agent -g agent /home/agent/.config/opencode
 COPY --chown=agent:agent opencode.json /home/agent/.config/opencode/opencode.json
