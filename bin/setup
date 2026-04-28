@@ -2,10 +2,10 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-IMAGE_NAME="opencode-dev"
+IMAGE_NAME="sandbox-dev"
 TAR_FILE="/tmp/${IMAGE_NAME}.tar"
 
-echo "=== Setting up opencode sandbox (one-time global setup) ==="
+echo "=== Setting up sandbox-dev template (one-time global setup) ==="
 
 # Detect platform
 ARCH="$(uname -m)"

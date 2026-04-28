@@ -4,7 +4,8 @@ set -euo pipefail
 SANDBOX="opencode-$(basename "$PWD")"
 
 if sbx ls 2>/dev/null | awk 'NR>1 {print $1}' | grep -qxF "$SANDBOX"; then
-  exec sbx run "$SANDBOX"
+  exec sbx exec -it -w $PWD "$SANDBOX" opencode .
 else
-  exec sbx run --template opencode-dev opencode .
+  sbx create -t sandbox-dev --quiet bash >/dev/null
+  exec sbx exec -it -w $PWD "$SANDBOX" opencode .
 fi
