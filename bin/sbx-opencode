@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SANDBOX="opencode-$(basename "$PWD")"
+SANDBOX="dev-$(basename "$PWD")"
 
-if sbx ls 2>/dev/null | awk 'NR>1 {print $1}' | grep -qxF "$SANDBOX"; then
-  exec sbx exec -it -w $PWD "$SANDBOX" opencode .
-else
-  sbx create -t sandbox-dev --quiet bash >/dev/null
-  exec sbx exec -it -w $PWD "$SANDBOX" opencode .
+if ! sbx ls 2>/dev/null | awk 'NR>1 {print $1}' | grep -qxF "$SANDBOX"; then
+  exec sbx run --name "$SANDBOX" -t sandbox-dev shell . -- -c "exec opencode ."
 fi
+exec sbx run "$SANDBOX" -- -c "exec opencode ."
