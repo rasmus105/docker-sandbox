@@ -34,19 +34,13 @@ RUN npm install -g @anthropic-ai/claude-code
 RUN npm install -g opencode-ai
 
 RUN install -d -o agent -g agent /home/agent/.config/opencode
-COPY --chown=agent:agent opencode.json /home/agent/.config/opencode/opencode.json
-COPY --chown=agent:agent tui.json /home/agent/.config/opencode/tui.json
 
 USER agent
 ENV PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/home/agent/.cargo/bin:${PATH}"
 
-RUN NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+RUN git clone https://github.com/rasmus105/dotfiles-ubuntu /tmp/dotfiles && \
+    cd /tmp/dotfiles && bash setup.sh && \
+    rm -rf /tmp/dotfiles
 
-RUN brew install zig
-
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-
-# Clean up .bashrc inherited from shell base image: remove PS1, add cargo env + checkwinsize
-RUN sed -i '/^PS1=/d' /home/agent/.bashrc \
-    && echo 'shopt -s checkwinsize' >> /home/agent/.bashrc \
-    && echo '. "$HOME/.cargo/env"' >> /home/agent/.bashrc
+COPY --chown=agent:agent opencode.json /home/agent/.config/opencode/opencode.json
+COPY --chown=agent:agent tui.json /home/agent/.config/opencode/tui.json
