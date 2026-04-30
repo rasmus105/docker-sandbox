@@ -1,4 +1,4 @@
-FROM docker/sandbox-templates:shell
+FROM docker/sandbox-templates:shell-docker
 
 LABEL com.docker.sandboxes.flavor=opencode
 
@@ -33,14 +33,19 @@ RUN npm install -g @anthropic-ai/claude-code
 
 RUN npm install -g opencode-ai
 
-RUN install -d -o agent -g agent /home/agent/.config/opencode
+RUN chown -R agent:agent /home/agent
+
+RUN echo "agent ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 USER agent
 ENV PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/home/agent/.cargo/bin:${PATH}"
 
-RUN git clone https://github.com/rasmus105/dotfiles-ubuntu /tmp/dotfiles && \
-    cd /tmp/dotfiles && bash setup.sh && \
-    rm -rf /tmp/dotfiles
+RUN git clone https://github.com/rasmus105/dotfiles-ubuntu /home/agent/.dotfiles && \
+    cd /home/agent/.dotfiles && bash setup.sh
+    
+# open neovim to install plugins
+RUN nvim --headless +qa
 
+# overwrite opencode configs to get all permissions
 COPY --chown=agent:agent opencode.json /home/agent/.config/opencode/opencode.json
 COPY --chown=agent:agent tui.json /home/agent/.config/opencode/tui.json
