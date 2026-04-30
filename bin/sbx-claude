@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
-SANDBOX="dev-$(basename "$PWD")"
-
-if ! sbx ls 2>/dev/null | awk 'NR>1 {print $1}' | grep -qxF "$SANDBOX"; then
-  exec sbx run --name "$SANDBOX" -t sandbox-dev shell . -- -c "exec claude --dangerously-skip-permissions"
-fi
-exec sbx run "$SANDBOX" -- -c "exec claude --dangerously-skip-permissions"
+source "$(dirname "$(realpath "$0")")/common.sh"
+parse_sbx_args "$@"
+sbx_run "exec claude --dangerously-skip-permissions"
