@@ -49,3 +49,4 @@ RUN nvim --headless +qa
 # overwrite opencode configs to get all permissions
 COPY --chown=agent:agent opencode.json /home/agent/.config/opencode/opencode.json
 COPY --chown=agent:agent tui.json /home/agent/.config/opencode/tui.json
+COPY --chown=agent:agent opencode-instructions.md /home/agent/.config/opencode/opencode-instructions.md
