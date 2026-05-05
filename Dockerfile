@@ -18,6 +18,7 @@ RUN apt-get update; \
         shellcheck \
         xz-utils \
         zip \
+        zsh \
         zlib1g-dev; \
     locale-gen en_US.UTF-8; \
     update-locale LANG=en_US.UTF-8; \
@@ -33,7 +34,8 @@ RUN npm install -g @anthropic-ai/claude-code
 
 RUN npm install -g opencode-ai
 
-RUN chown -R agent:agent /home/agent
+RUN chown -R agent:agent /home/agent && \
+    chsh -s /usr/bin/zsh agent
 
 RUN echo "agent ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 

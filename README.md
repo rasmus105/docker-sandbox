@@ -1,6 +1,6 @@
 # Usage
 Perform this one-time setup once:
-```bash
+```zsh
 # Setup the Docker sandbox template.
 ./bin/setup
 
@@ -10,7 +10,7 @@ ln -s /Users/kargo/git/personal/docker-sandbox/bin/sbx-claude /Users/kargo/.loca
 ln -s /Users/kargo/git/personal/docker-sandbox/bin/sbx-shell /Users/kargo/.local/bin/sbx-shell
 ```
 Then use it:
-```bash
+```zsh
 cd ~/git/my-project/
 sbx-opencode
 ```
