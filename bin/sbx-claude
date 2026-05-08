@@ -2,4 +2,4 @@
 set -euo pipefail
 source "$(dirname "$(realpath "$0")")/common.sh"
 parse_sbx_args "$@"
-sbx_run "exec claude --dangerously-skip-permissions"
+sbx_run claude --dangerously-skip-permissions

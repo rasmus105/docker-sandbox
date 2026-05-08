@@ -17,23 +17,30 @@ parse_sbx_args() {
   done
 }
 
-sbx_run() {
-  local cmd="$1"
-  local quoted_cmd=""
-  if [[ -n "$cmd" ]]; then
-    quoted_cmd="$(printf '%q' "$cmd")"
+copy_opencode_auth() {
+  local sandbox="$1"
+  local auth_file="$HOME/.local/share/opencode/auth.json"
+  local sandbox_auth_dir="/home/agent/.local/share/opencode"
+
+  if [[ ! -f "$auth_file" ]]; then
+    print -u2 "No opencode auth found at $auth_file; skipping auth copy."
+    return 0
   fi
+
+  sbx exec -u root "$sandbox" mkdir -p "$sandbox_auth_dir"
+  sbx cp "$auth_file" "$sandbox:$sandbox_auth_dir/auth.json"
+  sbx exec -u root "$sandbox" chown -R agent:agent "$sandbox_auth_dir"
+  sbx exec -u root "$sandbox" chmod 700 "$sandbox_auth_dir"
+  sbx exec -u root "$sandbox" chmod 600 "$sandbox_auth_dir/auth.json"
+}
+
+sbx_run() {
+  local command_args=("$@")
+  local login_exec='exec zsh -lc '\''exec "$@"'\'' zsh "$@"'
   SANDBOX="dev-$(basename "$PWD")"
   if ! sbx ls 2>/dev/null | awk 'NR>1 {print $1}' | grep -qxF "$SANDBOX"; then
-    if [[ -n "$cmd" ]]; then
-      exec sbx run --name "$SANDBOX" -t sandbox-dev "${BRANCH_ARGS[@]}" shell . -- -c "exec zsh -lc $quoted_cmd"
-    else
-      exec sbx run --name "$SANDBOX" -t sandbox-dev "${BRANCH_ARGS[@]}" shell . -- -c "exec zsh -l"
-    fi
+    sbx create --name "$SANDBOX" -t sandbox-dev "${BRANCH_ARGS[@]}" shell .
+    copy_opencode_auth "$SANDBOX"
   fi
-  if [[ -n "$cmd" ]]; then
-    exec sbx run "$SANDBOX" "${BRANCH_ARGS[@]}" -- -c "exec zsh -lc $quoted_cmd"
-  else
-    exec sbx run "$SANDBOX" "${BRANCH_ARGS[@]}" -- -c "exec zsh -l"
-  fi
+  exec sbx run "$SANDBOX" "${BRANCH_ARGS[@]}" -- -c "$login_exec" sh "${command_args[@]}"
 }
