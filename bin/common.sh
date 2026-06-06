@@ -22,7 +22,7 @@ sbx_run() {
   local login_exec='exec zsh -lc '\''exec "$@"'\'' zsh "$@"'
   local auth_file="$HOME/.local/share/opencode/auth.json"
   local auth_dir="${auth_file:h}"
-  local auth_exec='auth_file="$1"; shift; install -d -m 700 "$HOME/.local/share/opencode"; cp "$auth_file" "$HOME/.local/share/opencode/auth.json"; chmod 600 "$HOME/.local/share/opencode/auth.json"; exec zsh -lc '\''exec "$@"'\'' zsh "$@"'
+  local auth_exec='auth_file="$1"; shift; install -d -m 700 "$HOME/.local/share/opencode"; ln -sfn "$auth_file" "$HOME/.local/share/opencode/auth.json"; exec zsh -lc '\''exec "$@"'\'' zsh "$@"'
   SANDBOX="dev-$(basename "$PWD")"
   if ! sbx ls 2>/dev/null | awk 'NR>1 {print $1}' | grep -qxF "$SANDBOX"; then
     if [[ -f "$auth_file" ]]; then
