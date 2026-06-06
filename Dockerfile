@@ -6,16 +6,33 @@ USER root
 
 RUN apt-get update; \
     apt-get install -y --no-install-recommends \
+        binutils-arm-none-eabi \
         build-essential \
+        ccache \
         clang \
         cmake \
+        dfu-util \
         fd-find \
+        file \
+        gcc-arm-none-eabi \
         gdb \
+        gdb-multiarch \
+        jq \
+        less \
         lldb \
         locales \
+        ninja-build \
+        openocd \
+        openssh-client \
         pkg-config \
         protobuf-compiler \
+        python3 \
+        python3-pip \
+        python3-venv \
+        rsync \
         shellcheck \
+        stlink-tools \
+        unzip \
         xz-utils \
         zip \
         zsh \
