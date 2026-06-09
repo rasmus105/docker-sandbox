@@ -1,0 +1,89 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+CREDS_DIR="$HOME/.local/share/claude-code"
+AUTH_FILE="$CREDS_DIR/auth.json"
+
+echo "=== Claude Code Auth Setup for Sandboxes ==="
+echo ""
+
+mkdir -p "$CREDS_DIR"
+chmod 700 "$CREDS_DIR"
+
+# Try to extract existing credential from macOS keychain
+extracted_key=""
+if [[ "$(uname)" == "Darwin" ]]; then
+  # Claude Code uses keytar which stores under a service name
+  for service in "claude-code" "Claude Code" "anthropic" "Anthropic"; do
+    extracted_key="$(security find-generic-password -s "$service" -w 2>/dev/null)" && break
+  done
+fi
+
+if [[ -n "$extracted_key" ]]; then
+  echo "Found existing Claude credential in keychain."
+  echo "{\"apiKey\": \"$extracted_key\"}" > "$AUTH_FILE"
+  chmod 600 "$AUTH_FILE"
+  echo "Stored credential at $AUTH_FILE"
+  echo ""
+  echo "=== Done ==="
+  exit 0
+fi
+
+echo "No existing credential found in keychain."
+echo ""
+echo "Options:"
+echo "  1) Run 'claude setup-token' to create a long-lived token"
+echo "  2) Paste an API key from https://console.anthropic.com/settings/keys"
+echo ""
+read -r "choice?Choose (1 or 2): "
+
+case "$choice" in
+  1)
+    echo ""
+    echo "Running 'claude setup-token'..."
+    echo ""
+    claude setup-token
+    echo ""
+    # Try extraction again after setup-token
+    for service in "claude-code" "Claude Code" "anthropic" "Anthropic"; do
+      extracted_key="$(security find-generic-password -s "$service" -w 2>/dev/null)" && break
+    done
+    if [[ -n "$extracted_key" ]]; then
+      echo "{\"apiKey\": \"$extracted_key\"}" > "$AUTH_FILE"
+      chmod 600 "$AUTH_FILE"
+      echo "Stored credential at $AUTH_FILE"
+    else
+      echo "Could not extract credential from keychain after setup-token."
+      echo "Paste your API key manually:"
+      read -r "api_key?> "
+      if [[ -n "$api_key" ]]; then
+        echo "{\"apiKey\": \"$api_key\"}" > "$AUTH_FILE"
+        chmod 600 "$AUTH_FILE"
+        echo "Stored credential at $AUTH_FILE"
+      else
+        echo "No key provided. Run this script again to retry."
+        exit 1
+      fi
+    fi
+    ;;
+  2)
+    echo ""
+    echo "Paste your API key (starts with sk-ant-):"
+    read -r "api_key?> "
+    if [[ -z "$api_key" ]]; then
+      echo "No key provided."
+      exit 1
+    fi
+    echo "{\"apiKey\": \"$api_key\"}" > "$AUTH_FILE"
+    chmod 600 "$AUTH_FILE"
+    echo "Stored credential at $AUTH_FILE"
+    ;;
+  *)
+    echo "Invalid choice."
+    exit 1
+    ;;
+esac
+
+echo ""
+echo "=== Done ==="
+echo "You can now run 'sbx-claude' without re-authenticating each time."
