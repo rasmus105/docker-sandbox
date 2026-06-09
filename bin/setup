@@ -32,6 +32,10 @@ rm -f "$TAR_FILE"
 # Clean up the local Docker image (sbx has its own copy now)
 docker rmi "$IMAGE_NAME" 2>/dev/null || true
 
+# Whitelist domains needed by agents in sandboxes
+echo "[..] Configuring network policy..."
+sbx policy allow network "*.openrouter.ai"
+
 echo ""
 echo "=== Setup complete ==="
 echo "You can now run: sbx-opencode"
